@@ -314,6 +314,7 @@ static_assert(WLED_MAX_BUSSES <= 32, "WLED_MAX_BUSSES exceeds hard limit");
 #define TYPE_LPD8806             52
 #define TYPE_P9813               53
 #define TYPE_LPD6803             54
+#define TYPE_PIXIE               35
 #define TYPE_2PIN_MAX            63
 //Network types (master broadcast) (80-95)
 #define TYPE_VIRTUAL_MIN         80

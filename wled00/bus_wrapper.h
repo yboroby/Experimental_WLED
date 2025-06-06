@@ -4,6 +4,8 @@
 
 //#define NPB_CONF_4STEP_CADENCE
 #include "NeoPixelBusLg.h"
+#include <Adafruit_Pixie.h>
+#include <SoftwareSerial.h>
 
 //Hardware SPI Pins
 #define P_8266_HS_MOSI 13
@@ -134,6 +136,25 @@
 #define I_HS_LPO_3 109
 #define I_SS_LPO_3 110
 
+//Pixie serial
+#define I_8266_PIXIE 111
+#define I_32_PIXIE   112
+
+class PixieWrapper {
+  public:
+    PixieWrapper(uint16_t n, uint8_t tx) : _ss(-1, tx), _pixie(n, &_ss) {}
+    void Begin() { _ss.begin(115200); }
+    void Show(bool=true) { _pixie.show(); }
+    bool CanShow() { return _pixie.canShow(); }
+    void SetPixelColor(uint16_t i, uint32_t c) { _pixie.setPixelColor(i, c); }
+    void SetLuminance(uint8_t b) { _pixie.setBrightness(b); }
+    uint32_t GetPixelColor(uint16_t i) { return _pixie.getPixelColor(i); }
+    uint16_t PixelsSize() const { return _pixie.numPixels(); }
+  private:
+    SoftwareSerial _ss;
+    Adafruit_Pixie _pixie;
+};
+
 
 // In the following NeoGammaNullMethod can be replaced with NeoGammaWLEDMethod to perform Gamma correction implicitly
 // unfortunately that may apply Gamma correction to pre-calculated palettes which is undesired
@@ -200,6 +221,7 @@
 #define B_8266_U1_SM16825_5 NeoPixelBusLg<NeoRgbwcSm16825eFeature, NeoEsp8266Uart1Ws2813Method, NeoGammaNullMethod>
 #define B_8266_DM_SM16825_5 NeoPixelBusLg<NeoRgbwcSm16825eFeature, NeoEsp8266Dma800KbpsMethod, NeoGammaNullMethod>
 #define B_8266_BB_SM16825_5 NeoPixelBusLg<NeoRgbwcSm16825eFeature, NeoEsp8266BitBangWs2813Method, NeoGammaNullMethod>
+#define B_8266_PIXIE PixieWrapper
 #endif
 
 /*** ESP32 Neopixel methods ***/
@@ -293,6 +315,7 @@
 #define B_32_RN_SM16825_5 NeoPixelBusLg<NeoRgbcwSm16825eFeature, NeoEsp32RmtNWs2812xMethod, NeoGammaNullMethod>
 #define B_32_I2_SM16825_5 NeoPixelBusLg<NeoRgbcwSm16825eFeature, X1Ws2812xMethod, NeoGammaNullMethod>
 #define B_32_IP_SM16825_5 NeoPixelBusLg<NeoRgbcwSm16825eFeature, X8Ws2812xMethod, NeoGammaNullMethod> // parallel I2S
+#define B_32_PIXIE PixieWrapper
 #endif
 
 //APA102
@@ -465,6 +488,8 @@ class PolyBus {
       case I_SS_LPO_3: (static_cast<B_SS_LPO_3*>(busPtr))->Begin(); break;
       case I_SS_WS1_3: (static_cast<B_SS_WS1_3*>(busPtr))->Begin(); break;
       case I_SS_P98_3: (static_cast<B_SS_P98_3*>(busPtr))->Begin(); break;
+      case I_8266_PIXIE: (static_cast<B_8266_PIXIE*>(busPtr))->Begin(); break;
+      case I_32_PIXIE:   (static_cast<B_32_PIXIE*>(busPtr))->Begin(); break;
     }
   }
 
@@ -569,6 +594,8 @@ class PolyBus {
       case I_SS_WS1_3: busPtr = new B_SS_WS1_3(len, pins[1], pins[0]); break;
       case I_HS_P98_3: busPtr = new B_HS_P98_3(len, pins[1], pins[0]); break;
       case I_SS_P98_3: busPtr = new B_SS_P98_3(len, pins[1], pins[0]); break;
+      case I_8266_PIXIE: busPtr = new B_8266_PIXIE(len, pins[0]); break;
+      case I_32_PIXIE:   busPtr = new B_32_PIXIE(len, pins[0]); break;
     }
 
     return busPtr;
@@ -667,6 +694,8 @@ class PolyBus {
       case I_SS_WS1_3: (static_cast<B_SS_WS1_3*>(busPtr))->Show(consistent); break;
       case I_HS_P98_3: (static_cast<B_HS_P98_3*>(busPtr))->Show(consistent); break;
       case I_SS_P98_3: (static_cast<B_SS_P98_3*>(busPtr))->Show(consistent); break;
+      case I_8266_PIXIE: (static_cast<B_8266_PIXIE*>(busPtr))->Show(consistent); break;
+      case I_32_PIXIE:   (static_cast<B_32_PIXIE*>(busPtr))->Show(consistent); break;
     }
   }
 
@@ -763,6 +792,8 @@ class PolyBus {
       case I_SS_WS1_3: return (static_cast<B_SS_WS1_3*>(busPtr))->CanShow(); break;
       case I_HS_P98_3: return (static_cast<B_HS_P98_3*>(busPtr))->CanShow(); break;
       case I_SS_P98_3: return (static_cast<B_SS_P98_3*>(busPtr))->CanShow(); break;
+      case I_8266_PIXIE: return (static_cast<B_8266_PIXIE*>(busPtr))->CanShow(); break;
+      case I_32_PIXIE:   return (static_cast<B_32_PIXIE*>(busPtr))->CanShow(); break;
     }
     return true;
   }
@@ -885,6 +916,8 @@ class PolyBus {
       case I_SS_WS1_3: (static_cast<B_SS_WS1_3*>(busPtr))->SetPixelColor(pix, RgbColor(col)); break;
       case I_HS_P98_3: (static_cast<B_HS_P98_3*>(busPtr))->SetPixelColor(pix, RgbColor(col)); break;
       case I_SS_P98_3: (static_cast<B_SS_P98_3*>(busPtr))->SetPixelColor(pix, RgbColor(col)); break;
+      case I_8266_PIXIE: (static_cast<B_8266_PIXIE*>(busPtr))->SetPixelColor(pix, col); break;
+      case I_32_PIXIE:   (static_cast<B_32_PIXIE*>(busPtr))->SetPixelColor(pix, col); break;
     }
   }
 
@@ -981,6 +1014,8 @@ class PolyBus {
       case I_SS_WS1_3: (static_cast<B_SS_WS1_3*>(busPtr))->SetLuminance(b); break;
       case I_HS_P98_3: (static_cast<B_HS_P98_3*>(busPtr))->SetLuminance(b); break;
       case I_SS_P98_3: (static_cast<B_SS_P98_3*>(busPtr))->SetLuminance(b); break;
+      case I_8266_PIXIE: (static_cast<B_8266_PIXIE*>(busPtr))->SetLuminance(b); break;
+      case I_32_PIXIE:   (static_cast<B_32_PIXIE*>(busPtr))->SetLuminance(b); break;
     }
   }
 
@@ -1078,6 +1113,8 @@ class PolyBus {
       case I_SS_WS1_3: col = (static_cast<B_SS_WS1_3*>(busPtr))->GetPixelColor(pix); break;
       case I_HS_P98_3: col = (static_cast<B_HS_P98_3*>(busPtr))->GetPixelColor(pix); break;
       case I_SS_P98_3: col = (static_cast<B_SS_P98_3*>(busPtr))->GetPixelColor(pix); break;
+      case I_8266_PIXIE: col = (static_cast<B_8266_PIXIE*>(busPtr))->GetPixelColor(pix); break;
+      case I_32_PIXIE:   col = (static_cast<B_32_PIXIE*>(busPtr))->GetPixelColor(pix); break;
     }
 
     // upper nibble contains W swap information
@@ -1193,6 +1230,8 @@ class PolyBus {
       case I_SS_WS1_3: delete (static_cast<B_SS_WS1_3*>(busPtr)); break;
       case I_HS_P98_3: delete (static_cast<B_HS_P98_3*>(busPtr)); break;
       case I_SS_P98_3: delete (static_cast<B_SS_P98_3*>(busPtr)); break;
+      case I_8266_PIXIE: delete (static_cast<B_8266_PIXIE*>(busPtr)); break;
+      case I_32_PIXIE:   delete (static_cast<B_32_PIXIE*>(busPtr)); break;
     }
   }
 
@@ -1290,6 +1329,8 @@ class PolyBus {
       case I_SS_WS1_3: size = (static_cast<B_SS_WS1_3*>(busPtr))->PixelsSize()*2; break;
       case I_HS_P98_3: size = (static_cast<B_HS_P98_3*>(busPtr))->PixelsSize()*2; break;
       case I_SS_P98_3: size = (static_cast<B_SS_P98_3*>(busPtr))->PixelsSize()*2; break;
+      case I_8266_PIXIE: size = (static_cast<B_8266_PIXIE*>(busPtr))->PixelsSize()*2; break;
+      case I_32_PIXIE:   size = (static_cast<B_32_PIXIE*>(busPtr))->PixelsSize()*2; break;
     }
     return size;
   }
@@ -1421,6 +1462,8 @@ class PolyBus {
           return I_8266_U0_TM1914_3 + offset;
         case TYPE_SM16825:
           return I_8266_U0_SM16825_5 + offset;
+        case TYPE_PIXIE:
+          return I_8266_PIXIE;
       }
       #else //ESP32
       uint8_t offset = 0; // 0 = RMT (num 1-8), 1 = I2S0 (used by Audioreactive), 2 = I2S1
@@ -1483,6 +1526,8 @@ class PolyBus {
           return I_32_RN_TM1914_3 + offset;
         case TYPE_SM16825:
           return I_32_RN_SM16825_5 + offset;
+        case TYPE_PIXIE:
+          return I_32_PIXIE;
       }
       #endif
     }

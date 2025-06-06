@@ -59,6 +59,8 @@ See the [documentation on our official site](https://kno.wled.ge)!
 
 See [here](https://kno.wled.ge/basics/compatible-hardware)!
 
+- **Adafruit Pixie:** Connect the Pixie data input to a free TX pin on your controller and select "Adafruit Pixie" as the LED type in the LED settings.
+
 ## ✌️ Other
 
 Licensed under the EUPL v1.2 license  
