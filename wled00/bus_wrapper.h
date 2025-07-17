@@ -4,6 +4,7 @@
 
 //#define NPB_CONF_4STEP_CADENCE
 #include "NeoPixelBusLg.h"
+#include "apa104_NeoPixel.h"
 #include <Adafruit_Pixie.h>
 #include <SoftwareSerial.h>
 
@@ -77,6 +78,11 @@
 #define I_8266_U1_SM16825_5 46
 #define I_8266_DM_SM16825_5 47
 #define I_8266_BB_SM16825_5 48
+//ESP8266 APA104
+#define I_8266_U0_APA104_3 49
+#define I_8266_U1_APA104_3 50
+#define I_8266_DM_APA104_3 51
+#define I_8266_BB_APA104_3 52
 
 /*** ESP32 Neopixel methods ***/
 //RGB
@@ -106,6 +112,9 @@
 //APA106
 #define I_32_RN_APA106_3 33
 #define I_32_I2_APA106_3 34
+//APA104
+#define I_32_RN_APA104_3 49
+#define I_32_I2_APA104_3 50
 //WS2805 (RGBCW)
 #define I_32_RN_2805_5 37
 #define I_32_I2_2805_5 38
@@ -201,6 +210,11 @@ class PixieWrapper {
 #define B_8266_U1_APA106_3 NeoPixelBusLg<NeoRbgFeature, NeoEsp8266Uart1Apa106Method, NeoGammaNullMethod> //3 chan, esp8266, gpio2
 #define B_8266_DM_APA106_3 NeoPixelBusLg<NeoGrbFeature, NeoEsp8266DmaApa106Method, NeoGammaNullMethod>  //3 chan, esp8266, gpio3
 #define B_8266_BB_APA106_3 NeoPixelBusLg<NeoGrbFeature, NeoEsp8266BitBangApa106Method, NeoGammaNullMethod> //3 chan, esp8266, bb (any pin but 16)
+//APA104
+#define B_8266_U0_APA104_3 NeoPixelBusLg<NeoGrbFeature, NeoEsp8266Uart0Apa104Method, NeoGammaNullMethod> //3 chan, esp8266, gpio1
+#define B_8266_U1_APA104_3 NeoPixelBusLg<NeoGrbFeature, NeoEsp8266Uart1Apa104Method, NeoGammaNullMethod> //3 chan, esp8266, gpio2
+#define B_8266_DM_APA104_3 NeoPixelBusLg<NeoGrbFeature, NeoEsp8266DmaApa104Method, NeoGammaNullMethod>  //3 chan, esp8266, gpio3
+#define B_8266_BB_APA104_3 NeoPixelBusLg<NeoGrbFeature, NeoEsp8266BitBangApa106Method, NeoGammaNullMethod> // reuse bitbang
 //FW1906 GRBCW
 #define B_8266_U0_FW6_5 NeoPixelBusLg<NeoGrbcwxFeature, NeoEsp8266Uart0Ws2813Method, NeoGammaNullMethod>   //esp8266, gpio1
 #define B_8266_U1_FW6_5 NeoPixelBusLg<NeoGrbcwxFeature, NeoEsp8266Uart1Ws2813Method, NeoGammaNullMethod>   //esp8266, gpio2
@@ -299,6 +313,10 @@ class PixieWrapper {
 #define B_32_RN_APA106_3 NeoPixelBusLg<NeoGrbFeature, NeoEsp32RmtNApa106Method, NeoGammaNullMethod>
 #define B_32_I2_APA106_3 NeoPixelBusLg<NeoGrbFeature, X1Apa106Method, NeoGammaNullMethod>
 #define B_32_IP_APA106_3 NeoPixelBusLg<NeoGrbFeature, X8Apa106Method, NeoGammaNullMethod> // parallel I2S
+//APA104
+#define B_32_RN_APA104_3 NeoPixelBusLg<NeoGrbFeature, NeoEsp32RmtNApa104Method, NeoGammaNullMethod>
+#define B_32_I2_APA104_3 NeoPixelBusLg<NeoGrbFeature, NeoEsp32Rmt1Apa104Method, NeoGammaNullMethod>
+#define B_32_IP_APA104_3 NeoPixelBusLg<NeoGrbFeature, NeoEsp32RmtNApa104Method, NeoGammaNullMethod> // parallel I2S
 //FW1906 GRBCW
 #define B_32_RN_FW6_5 NeoPixelBusLg<NeoGrbcwxFeature, NeoEsp32RmtNWs2812xMethod, NeoGammaNullMethod>
 #define B_32_I2_FW6_5 NeoPixelBusLg<NeoGrbcwxFeature, X1800KbpsMethod, NeoGammaNullMethod>
@@ -430,6 +448,10 @@ class PolyBus {
       case I_8266_U1_APA106_3: (static_cast<B_8266_U1_APA106_3*>(busPtr))->Begin(); break;
       case I_8266_DM_APA106_3: (static_cast<B_8266_DM_APA106_3*>(busPtr))->Begin(); break;
       case I_8266_BB_APA106_3: (static_cast<B_8266_BB_APA106_3*>(busPtr))->Begin(); break;
+      case I_8266_U0_APA104_3: (static_cast<B_8266_U0_APA104_3*>(busPtr))->Begin(); break;
+      case I_8266_U1_APA104_3: (static_cast<B_8266_U1_APA104_3*>(busPtr))->Begin(); break;
+      case I_8266_DM_APA104_3: (static_cast<B_8266_DM_APA104_3*>(busPtr))->Begin(); break;
+      case I_8266_BB_APA104_3: (static_cast<B_8266_BB_APA104_3*>(busPtr))->Begin(); break;
       case I_8266_U0_FW6_5: (static_cast<B_8266_U0_FW6_5*>(busPtr))->Begin(); break;
       case I_8266_U1_FW6_5: (static_cast<B_8266_U1_FW6_5*>(busPtr))->Begin(); break;
       case I_8266_DM_FW6_5: (static_cast<B_8266_DM_FW6_5*>(busPtr))->Begin(); break;
@@ -536,6 +558,10 @@ class PolyBus {
       case I_8266_U1_APA106_3: busPtr = new B_8266_U1_APA106_3(len, pins[0]); break;
       case I_8266_DM_APA106_3: busPtr = new B_8266_DM_APA106_3(len, pins[0]); break;
       case I_8266_BB_APA106_3: busPtr = new B_8266_BB_APA106_3(len, pins[0]); break;
+      case I_8266_U0_APA104_3: busPtr = new B_8266_U0_APA104_3(len, pins[0]); break;
+      case I_8266_U1_APA104_3: busPtr = new B_8266_U1_APA104_3(len, pins[0]); break;
+      case I_8266_DM_APA104_3: busPtr = new B_8266_DM_APA104_3(len, pins[0]); break;
+      case I_8266_BB_APA104_3: busPtr = new B_8266_BB_APA104_3(len, pins[0]); break;
       case I_8266_U0_FW6_5: busPtr = new B_8266_U0_FW6_5(len, pins[0]); break;
       case I_8266_U1_FW6_5: busPtr = new B_8266_U1_FW6_5(len, pins[0]); break;
       case I_8266_DM_FW6_5: busPtr = new B_8266_DM_FW6_5(len, pins[0]); break;
@@ -637,6 +663,10 @@ class PolyBus {
       case I_8266_U1_APA106_3: (static_cast<B_8266_U1_APA106_3*>(busPtr))->Show(consistent); break;
       case I_8266_DM_APA106_3: (static_cast<B_8266_DM_APA106_3*>(busPtr))->Show(consistent); break;
       case I_8266_BB_APA106_3: (static_cast<B_8266_BB_APA106_3*>(busPtr))->Show(consistent); break;
+      case I_8266_U0_APA104_3: (static_cast<B_8266_U0_APA104_3*>(busPtr))->Show(consistent); break;
+      case I_8266_U1_APA104_3: (static_cast<B_8266_U1_APA104_3*>(busPtr))->Show(consistent); break;
+      case I_8266_DM_APA104_3: (static_cast<B_8266_DM_APA104_3*>(busPtr))->Show(consistent); break;
+      case I_8266_BB_APA104_3: (static_cast<B_8266_BB_APA104_3*>(busPtr))->Show(consistent); break;
       case I_8266_U0_FW6_5: (static_cast<B_8266_U0_FW6_5*>(busPtr))->Show(consistent); break;
       case I_8266_U1_FW6_5: (static_cast<B_8266_U1_FW6_5*>(busPtr))->Show(consistent); break;
       case I_8266_DM_FW6_5: (static_cast<B_8266_DM_FW6_5*>(busPtr))->Show(consistent); break;
@@ -735,6 +765,10 @@ class PolyBus {
       case I_8266_U1_APA106_3: return (static_cast<B_8266_U1_APA106_3*>(busPtr))->CanShow(); break;
       case I_8266_DM_APA106_3: return (static_cast<B_8266_DM_APA106_3*>(busPtr))->CanShow(); break;
       case I_8266_BB_APA106_3: return (static_cast<B_8266_BB_APA106_3*>(busPtr))->CanShow(); break;
+      case I_8266_U0_APA104_3: return (static_cast<B_8266_U0_APA104_3*>(busPtr))->CanShow(); break;
+      case I_8266_U1_APA104_3: return (static_cast<B_8266_U1_APA104_3*>(busPtr))->CanShow(); break;
+      case I_8266_DM_APA104_3: return (static_cast<B_8266_DM_APA104_3*>(busPtr))->CanShow(); break;
+      case I_8266_BB_APA104_3: return (static_cast<B_8266_BB_APA104_3*>(busPtr))->CanShow(); break;
       case I_8266_U0_FW6_5: return (static_cast<B_8266_U0_FW6_5*>(busPtr))->CanShow(); break;
       case I_8266_U1_FW6_5: return (static_cast<B_8266_U1_FW6_5*>(busPtr))->CanShow(); break;
       case I_8266_DM_FW6_5: return (static_cast<B_8266_DM_FW6_5*>(busPtr))->CanShow(); break;
@@ -859,6 +893,10 @@ class PolyBus {
       case I_8266_U1_APA106_3: (static_cast<B_8266_U1_APA106_3*>(busPtr))->SetPixelColor(pix, RgbColor(col)); break;
       case I_8266_DM_APA106_3: (static_cast<B_8266_DM_APA106_3*>(busPtr))->SetPixelColor(pix, RgbColor(col)); break;
       case I_8266_BB_APA106_3: (static_cast<B_8266_BB_APA106_3*>(busPtr))->SetPixelColor(pix, RgbColor(col)); break;
+      case I_8266_U0_APA104_3: (static_cast<B_8266_U0_APA104_3*>(busPtr))->SetPixelColor(pix, RgbColor(col)); break;
+      case I_8266_U1_APA104_3: (static_cast<B_8266_U1_APA104_3*>(busPtr))->SetPixelColor(pix, RgbColor(col)); break;
+      case I_8266_DM_APA104_3: (static_cast<B_8266_DM_APA104_3*>(busPtr))->SetPixelColor(pix, RgbColor(col)); break;
+      case I_8266_BB_APA104_3: (static_cast<B_8266_BB_APA104_3*>(busPtr))->SetPixelColor(pix, RgbColor(col)); break;
       case I_8266_U0_FW6_5: (static_cast<B_8266_U0_FW6_5*>(busPtr))->SetPixelColor(pix, RgbwwColor(col.R, col.G, col.B, cctWW, cctCW)); break;
       case I_8266_U1_FW6_5: (static_cast<B_8266_U1_FW6_5*>(busPtr))->SetPixelColor(pix, RgbwwColor(col.R, col.G, col.B, cctWW, cctCW)); break;
       case I_8266_DM_FW6_5: (static_cast<B_8266_DM_FW6_5*>(busPtr))->SetPixelColor(pix, RgbwwColor(col.R, col.G, col.B, cctWW, cctCW)); break;
@@ -957,6 +995,10 @@ class PolyBus {
       case I_8266_U1_APA106_3: (static_cast<B_8266_U1_APA106_3*>(busPtr))->SetLuminance(b); break;
       case I_8266_DM_APA106_3: (static_cast<B_8266_DM_APA106_3*>(busPtr))->SetLuminance(b); break;
       case I_8266_BB_APA106_3: (static_cast<B_8266_BB_APA106_3*>(busPtr))->SetLuminance(b); break;
+      case I_8266_U0_APA104_3: (static_cast<B_8266_U0_APA104_3*>(busPtr))->SetLuminance(b); break;
+      case I_8266_U1_APA104_3: (static_cast<B_8266_U1_APA104_3*>(busPtr))->SetLuminance(b); break;
+      case I_8266_DM_APA104_3: (static_cast<B_8266_DM_APA104_3*>(busPtr))->SetLuminance(b); break;
+      case I_8266_BB_APA104_3: (static_cast<B_8266_BB_APA104_3*>(busPtr))->SetLuminance(b); break;
       case I_8266_U0_FW6_5: (static_cast<B_8266_U0_FW6_5*>(busPtr))->SetLuminance(b); break;
       case I_8266_U1_FW6_5: (static_cast<B_8266_U1_FW6_5*>(busPtr))->SetLuminance(b); break;
       case I_8266_DM_FW6_5: (static_cast<B_8266_DM_FW6_5*>(busPtr))->SetLuminance(b); break;
@@ -1056,6 +1098,10 @@ class PolyBus {
       case I_8266_U1_APA106_3: col = (static_cast<B_8266_U1_APA106_3*>(busPtr))->GetPixelColor(pix); break;
       case I_8266_DM_APA106_3: col = (static_cast<B_8266_DM_APA106_3*>(busPtr))->GetPixelColor(pix); break;
       case I_8266_BB_APA106_3: col = (static_cast<B_8266_BB_APA106_3*>(busPtr))->GetPixelColor(pix); break;
+      case I_8266_U0_APA104_3: col = (static_cast<B_8266_U0_APA104_3*>(busPtr))->GetPixelColor(pix); break;
+      case I_8266_U1_APA104_3: col = (static_cast<B_8266_U1_APA104_3*>(busPtr))->GetPixelColor(pix); break;
+      case I_8266_DM_APA104_3: col = (static_cast<B_8266_DM_APA104_3*>(busPtr))->GetPixelColor(pix); break;
+      case I_8266_BB_APA104_3: col = (static_cast<B_8266_BB_APA104_3*>(busPtr))->GetPixelColor(pix); break;
       case I_8266_U0_FW6_5: { RgbwwColor c = (static_cast<B_8266_U0_FW6_5*>(busPtr))->GetPixelColor(pix); col = RGBW32(c.R,c.G,c.B,max(c.WW,c.CW)); } break; // will not return original W
       case I_8266_U1_FW6_5: { RgbwwColor c = (static_cast<B_8266_U1_FW6_5*>(busPtr))->GetPixelColor(pix); col = RGBW32(c.R,c.G,c.B,max(c.WW,c.CW)); } break; // will not return original W
       case I_8266_DM_FW6_5: { RgbwwColor c = (static_cast<B_8266_DM_FW6_5*>(busPtr))->GetPixelColor(pix); col = RGBW32(c.R,c.G,c.B,max(c.WW,c.CW)); } break; // will not return original W
@@ -1173,6 +1219,10 @@ class PolyBus {
       case I_8266_U1_APA106_3: delete (static_cast<B_8266_U1_APA106_3*>(busPtr)); break;
       case I_8266_DM_APA106_3: delete (static_cast<B_8266_DM_APA106_3*>(busPtr)); break;
       case I_8266_BB_APA106_3: delete (static_cast<B_8266_BB_APA106_3*>(busPtr)); break;
+      case I_8266_U0_APA104_3: delete (static_cast<B_8266_U0_APA104_3*>(busPtr)); break;
+      case I_8266_U1_APA104_3: delete (static_cast<B_8266_U1_APA104_3*>(busPtr)); break;
+      case I_8266_DM_APA104_3: delete (static_cast<B_8266_DM_APA104_3*>(busPtr)); break;
+      case I_8266_BB_APA104_3: delete (static_cast<B_8266_BB_APA104_3*>(busPtr)); break;
       case I_8266_U0_FW6_5: delete (static_cast<B_8266_U0_FW6_5*>(busPtr)); break;
       case I_8266_U1_FW6_5: delete (static_cast<B_8266_U1_FW6_5*>(busPtr)); break;
       case I_8266_DM_FW6_5: delete (static_cast<B_8266_DM_FW6_5*>(busPtr)); break;
@@ -1272,6 +1322,10 @@ class PolyBus {
       case I_8266_U1_APA106_3: size = (static_cast<B_8266_U1_APA106_3*>(busPtr))->PixelsSize()*2; break;
       case I_8266_DM_APA106_3: size = (static_cast<B_8266_DM_APA106_3*>(busPtr))->PixelsSize()*5; break;
       case I_8266_BB_APA106_3: size = (static_cast<B_8266_BB_APA106_3*>(busPtr))->PixelsSize()*2; break;
+      case I_8266_U0_APA104_3: size = (static_cast<B_8266_U0_APA104_3*>(busPtr))->PixelsSize()*2; break;
+      case I_8266_U1_APA104_3: size = (static_cast<B_8266_U1_APA104_3*>(busPtr))->PixelsSize()*2; break;
+      case I_8266_DM_APA104_3: size = (static_cast<B_8266_DM_APA104_3*>(busPtr))->PixelsSize()*5; break;
+      case I_8266_BB_APA104_3: size = (static_cast<B_8266_BB_APA104_3*>(busPtr))->PixelsSize()*2; break;
       case I_8266_U0_FW6_5: size = (static_cast<B_8266_U0_FW6_5*>(busPtr))->PixelsSize()*2; break;
       case I_8266_U1_FW6_5: size = (static_cast<B_8266_U1_FW6_5*>(busPtr))->PixelsSize()*2; break;
       case I_8266_DM_FW6_5: size = (static_cast<B_8266_DM_FW6_5*>(busPtr))->PixelsSize()*5; break;
@@ -1454,6 +1508,8 @@ class PolyBus {
           return I_8266_U0_UCS_4 + offset;
         case TYPE_APA106:
           return I_8266_U0_APA106_3 + offset;
+        case TYPE_APA104:
+          return I_8266_U0_APA104_3 + offset;
         case TYPE_FW1906:
           return I_8266_U0_FW6_5 + offset;
         case TYPE_WS2805:
@@ -1518,6 +1574,8 @@ class PolyBus {
           return I_32_RN_UCS_4 + offset;
         case TYPE_APA106:
           return I_32_RN_APA106_3 + offset;
+        case TYPE_APA104:
+          return I_32_RN_APA104_3 + offset;
         case TYPE_FW1906:
           return I_32_RN_FW6_5 + offset;
         case TYPE_WS2805:
