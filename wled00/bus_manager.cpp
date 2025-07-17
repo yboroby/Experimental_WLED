@@ -345,6 +345,7 @@ std::vector<LEDType> BusDigital::getLEDTypes() {
     {TYPE_TM1829,        "D",  PSTR("TM1829")},
     {TYPE_UCS8903,       "D",  PSTR("UCS8903")},
     {TYPE_APA106,        "D",  PSTR("APA106/PL9823")},
+    {TYPE_APA104,        "D",  PSTR("APA104")},
     {TYPE_TM1914,        "D",  PSTR("TM1914")},
     {TYPE_FW1906,        "D",  PSTR("FW1906 GRBCW")},
     {TYPE_UCS8904,       "D",  PSTR("UCS8904 RGBW")},

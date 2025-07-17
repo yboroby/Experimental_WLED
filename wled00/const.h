@@ -289,6 +289,7 @@ static_assert(WLED_MAX_BUSSES <= 32, "WLED_MAX_BUSSES exceeds hard limit");
 #define TYPE_TM1829              25
 #define TYPE_UCS8903             26
 #define TYPE_APA106              27
+#define TYPE_APA104              36
 #define TYPE_FW1906              28            //RGB + CW + WW + unused channel (6 channels per IC)
 #define TYPE_UCS8904             29            //first RGBW digital type (hardcoded in busmanager.cpp, memUsage())
 #define TYPE_SK6812_RGBW         30
